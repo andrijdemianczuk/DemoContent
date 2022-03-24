@@ -122,4 +122,44 @@ df.createOrReplaceTempView("mlflow_input_vw")
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC -- This is the fastest and easiest way to create delta tables. Since we use the 'Using DELTA' moniker, we will see that our tables are actually created as managed parquet under the hood.
+# MAGIC DROP TABLE IF EXISTS mlf_current_readings_labeled;
+# MAGIC 
+# MAGIC CREATE TABLE mlf_current_readings_labeled 
+# MAGIC USING DELTA
+# MAGIC AS (
+# MAGIC   SELECT * FROM mlflow_input_vw
+# MAGIC )
 
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- Same thing again, although we'll omit the label column. We'll use this table later to demonstrate how we collect labels and apply them.
+# MAGIC DROP TABLE IF EXISTS mlf_current_readings_unlabeled;
+# MAGIC 
+# MAGIC CREATE TABLE mlf_current_readings_unlabeled 
+# MAGIC USING DELTA
+# MAGIC AS (
+# MAGIC   SELECT 
+# MAGIC     id,
+# MAGIC     reading_time,
+# MAGIC     device_type,
+# MAGIC     device_id,
+# MAGIC     reading_1,
+# MAGIC     reading_2,
+# MAGIC     reading_3
+# MAGIC   FROM mlflow_input_vw
+# MAGIC )
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- Example of how to get the details of the table
+# MAGIC DESCRIBE ademianczuk.mlf_current_readings_labeled;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- Example of how to get the storage details of the table. If you're using databricks managed tables, this is handy to understand where the parquet and delta files are living. This defaults to the root workspace storage location
+# MAGIC DESCRIBE DETAIL ademianczuk.mlf_current_readings_unlabeled;
